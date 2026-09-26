@@ -1,0 +1,108 @@
+.contact__window {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4rem);
+  padding: clamp(1.75rem, 4vw, 3.5rem);
+  background:
+    radial-gradient(40rem 20rem at 0% 0%, rgba(245, 196, 81, 0.1), transparent 60%),
+    linear-gradient(180deg, var(--c-window-top), var(--c-window-bottom));
+}
+
+.contact__lead {
+  font-size: var(--fs-2xl);
+  line-height: 1.4;
+}
+
+.contact__br {
+  display: none;
+}
+
+.contact__text {
+  margin-top: var(--sp-4);
+  color: var(--c-text-muted);
+}
+
+.contact__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  margin-top: var(--sp-6);
+}
+
+.contact__email {
+  margin-top: var(--sp-3);
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+  word-break: break-all;
+}
+
+.contact__side {
+  padding-left: clamp(0rem, 4vw, 3rem);
+  border-left: 1px solid var(--c-line);
+}
+
+.contact__side-title {
+  color: var(--c-gold);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+}
+
+.contact__links {
+  display: grid;
+  margin-top: var(--sp-3);
+}
+
+.contact__link {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: var(--sp-3);
+  align-items: center;
+  min-height: 56px;
+  border-bottom: 1px dashed var(--c-line);
+  transition: color var(--dur-fast);
+}
+
+.contact__link-label {
+  font-weight: 700;
+}
+
+.contact__link-handle {
+  color: var(--c-text-dim);
+  font-size: var(--fs-sm);
+}
+
+.contact__link-arrow {
+  color: var(--c-text-dim);
+  transition: transform var(--dur-base) var(--ease-out), color var(--dur-fast);
+}
+
+.contact__link:hover .contact__link-label,
+.contact__link:hover .contact__link-arrow {
+  color: var(--c-gold);
+}
+
+.contact__link:hover .contact__link-arrow {
+  transform: translate(3px, -3px);
+}
+
+@media (max-width: 840px) {
+  .contact__window {
+    grid-template-columns: 1fr;
+  }
+
+  .contact__side {
+    padding: var(--sp-5) 0 0;
+    border-left: 0;
+    border-top: 1px solid var(--c-line);
+  }
+}
+
+@media (max-width: 600px) {
+  .contact__br {
+    display: inline;
+  }
+
+  .contact__actions .btn {
+    flex: 1 1 100%;
+  }
+}

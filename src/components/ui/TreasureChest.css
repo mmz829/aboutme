@@ -1,0 +1,41 @@
+.chest {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  opacity: 0.55;
+  transition:
+    opacity var(--dur-base),
+    transform var(--dur-base) var(--ease-out);
+}
+
+.chest__sprite {
+  width: 28px;
+  height: auto;
+}
+
+.chest:hover,
+.chest:focus-visible {
+  opacity: 1;
+  animation: chest-wiggle 0.5s var(--ease-out);
+}
+
+.chest.is-open {
+  opacity: 0.8;
+  cursor: default;
+  animation: none;
+}
+
+@keyframes chest-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-8deg);
+  }
+  60% {
+    transform: rotate(6deg);
+  }
+}
