@@ -1,0 +1,5 @@
+node_modules
+dist
+.venv_png
+.fonts
+__pycache__

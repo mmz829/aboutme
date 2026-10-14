@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>chihiro</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="editor">
+    <header class="titlebar">
+      <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+      <span class="titlebar-text">chihiro — ~/aboutme</span>
+    </header>
+
+    <div class="workspace">
+      <aside class="sidebar">
+        <p class="sidebar-head">EXPLORER</p>
+        <p class="tree-dir">▾ aboutme</p>
+        <ul class="tree" id="tree"></ul>
+      </aside>
+
+      <div class="main">
+        <nav class="tabs" id="tabs"></nav>
+        <div class="files" id="files"></div>
+      </div>
+    </div>
+
+    <footer class="statusbar">
+      <span>⎇ main</span>
+      <span id="status-file">README.md</span>
+      <span class="status-right">UTF-8</span>
+      <span>(=^･ω･^=)</span>
+    </footer>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
