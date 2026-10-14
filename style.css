@@ -17,8 +17,7 @@
   --gauge: #9d8cc4;
   --gauge-empty: #4a4b5e;
   --statusbar: #343746;
-  --dot: "DotGothic16", sans-serif;
-  --mono: "JetBrains Mono", "DotGothic16", monospace;
+  --mono: "HackGen", monospace;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -75,7 +74,7 @@ a { color: inherit; text-decoration: none; }
 }
 .sidebar > * { position: relative; }
 .sidebar-head, .tree-dir, .tree { padding-left: 14px; }
-.sidebar-head { font-family: var(--dot); color: var(--muted); padding-top: 10px; letter-spacing: .1em; font-size: 11px; }
+.sidebar-head { color: var(--muted); padding-top: 10px; letter-spacing: .1em; font-size: 11px; }
 .tree-dir { color: var(--text); }
 .tree { list-style: none; position: sticky; top: 44px; padding-bottom: 12px; }
 .tree a { display: block; padding: 0 0 0 16px; color: var(--muted); border-left: 2px solid transparent; }
@@ -116,13 +115,52 @@ a { color: inherit; text-decoration: none; }
 .c-kw { color: var(--c-kw); }
 .c-comment { color: var(--c-comment); }
 .c-hash { color: var(--c-hash); }
-.c-h1 { font-family: var(--dot); font-size: 20px; color: var(--text); line-height: 1.6; }
+.c-h1 { font-size: 20px; color: var(--text); line-height: 1.6; }
 .c-h1 .c-mark, .c-h2 .c-mark { color: var(--accent); }
-.c-title { font-family: var(--dot); font-size: 15px; letter-spacing: .05em; line-height: 1.6; }
+.c-title { font-size: 15px; letter-spacing: .05em; line-height: 1.6; }
 .c-title .c-mark { color: var(--accent); }
-.c-h2 { font-family: var(--dot); font-size: 15px; }
-.c-text { font-family: var(--dot); }
+.c-h2 { font-size: 15px; }
+
+/* profile */
+.pf-row {
+  display: flex; align-items: baseline; gap: 20px; max-width: 520px;
+  padding: 4px 10px; white-space: normal;
+  border-bottom: 1px dashed var(--border); border-radius: 4px;
+  transition: background .2s ease;
+}
+.pf-key {
+  flex: 0 0 9.5em; white-space: nowrap; display: flex; align-items: center; gap: 8px;
+  color: var(--c-key); font-size: 10px; letter-spacing: .15em; text-transform: uppercase;
+  transition: color .2s ease;
+}
+.pf-key::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+.pf-val { flex: 1; min-width: 0; font-size: 14px; }
+.pf-row:hover { background: var(--accent-light); }
+.pf-row:hover .pf-key { color: var(--muted); }
+
+/* career timeline */
+.tl-item { position: relative; margin-left: 6px; padding: 0 0 22px 24px; border-left: 1px dashed var(--ln); white-space: normal; }
+.line:last-child .tl-item { border-left-color: transparent; padding-bottom: 0; }
+.tl-item::before {
+  content: ""; position: absolute; left: -6px; top: .55em;
+  width: 9px; height: 9px; border-radius: 50%;
+  border: 2px solid var(--accent); background: var(--editor-bg);
+}
+.tl-item.latest::before { background: var(--accent); box-shadow: 0 0 0 3px rgba(191, 158, 238, .2); }
+.tl-date { color: var(--c-hash); font-size: 12px; letter-spacing: .05em; }
+.tl-title { font-size: 15px; font-weight: normal; line-height: 1.6; }
+.tl-work { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.tl-tags { list-style: none; display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+.tl-tags li {
+  padding: 0 7px; font-size: 11px; line-height: 1.8;
+  color: var(--text); background: var(--accent-light); border-radius: 3px;
+}
+.tl-item.reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform .6s ease; }
+.tl-item.reveal.shown { opacity: 1; transform: none; }
 .c-aa { color: var(--accent); white-space: pre; }
+.aa-star { color: var(--c-str); }
+.aa-tail { color: var(--ln); }
+.aa-say { color: var(--c-kw); }
 
 .cursor { color: var(--accent); animation: blink 1s steps(1) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
@@ -146,8 +184,7 @@ a { color: inherit; text-decoration: none; }
   .editor { margin: 0; border: none; border-radius: 0; }
   .titlebar, .statusbar { border-radius: 0; }
   .sidebar { display: none; }
-  .ln { width: 2.4em; padding-right: .7em; }
-  .c-h1 { font-size: 18px; }
+  .ln { width: 2.4em; padding-right: .7em; }  .c-h1 { font-size: 18px; }
   .status-right { display: none; }
   .statusbar span:last-child { margin-left: auto; }
 }
