@@ -9,27 +9,21 @@ export function Footer() {
   return (
     <footer className="footer">
       <div className="footer__inner container">
-        <p className="footer__thanks pixel">THANK YOU FOR PLAYING</p>
-
-        <p className="footer__treasure">
-          <span className="pixel footer__treasure-count">
+        <div>
+          <p className="footer__thanks">THANK YOU FOR PLAYING</p>
+          <p className="footer__treasure">
             宝箱 {found.size} / {treasures.length}
-          </span>
-          <span className="footer__treasure-hint">
+            {' — '}
             {complete
-              ? 'すべての宝箱を見つけました。ありがとうございます！'
+              ? 'すべての宝箱を見つけました。'
               : 'このページのどこかに、小さな宝箱が隠れています。'}
-          </span>
-        </p>
-
-        <div className="footer__bottom">
+          </p>
+        </div>
+        <div>
           <p className="footer__copy">
             © {new Date().getFullYear()} {profile.name}. Designed &amp; built with React + TypeScript.
           </p>
           <a href="#top" className="footer__top">
-            <span className="pixel" aria-hidden="true">
-              ▲
-            </span>
             ページの先頭へ
           </a>
         </div>

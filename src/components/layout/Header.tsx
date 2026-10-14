@@ -37,13 +37,8 @@ export function Header() {
     <header className={`header ${progress > 0.01 ? 'is-scrolled' : ''}`}>
       <div className="header__inner container">
         <a href="#top" className="header__logo" onClick={() => setOpen(false)}>
-          <span className="header__logo-mark pixel" aria-hidden="true">
-            C
-          </span>
-          <span className="header__logo-text">
-            <span className="header__logo-name">{profile.name}</span>
-            <span className="header__logo-role">{profile.role}</span>
-          </span>
+          <span className="header__logo-name">{profile.name}</span>
+          <span className="header__logo-role">{profile.role}</span>
         </a>
 
         <nav className="header__nav" aria-label="メインナビゲーション">
@@ -55,15 +50,12 @@ export function Header() {
                   className={`nav-link ${active === item.id ? 'is-active' : ''}`}
                   aria-current={active === item.id ? 'location' : undefined}
                 >
-                  <span className="nav-link__cursor pixel" aria-hidden="true">
-                    ▶
-                  </span>
                   {item.label}
                 </a>
               </li>
             ))}
           </ul>
-          <a href="#contact" className="btn btn--primary header__cta">
+          <a href="#contact" className="header__cta">
             お問い合わせ
           </a>
         </nav>
@@ -86,8 +78,8 @@ export function Header() {
         <div className="exp__track">
           <div className="exp__fill" style={{ transform: `scaleX(${progress})` }} />
         </div>
-        <span className={`exp__label pixel ${levelUp ? 'is-levelup' : ''}`}>
-          {levelUp ? 'LEVEL UP!' : `EXP ${Math.round(progress * 100)}%`}
+        <span className={`exp__label ${levelUp ? 'is-levelup' : ''}`}>
+          {levelUp ? 'LEVEL UP' : `EXP ${Math.round(progress * 100)}%`}
         </span>
       </div>
 
@@ -97,10 +89,7 @@ export function Header() {
         className={`mobile-menu ${open ? 'is-open' : ''}`}
         hidden={!open}
       >
-        <nav aria-label="モバイルナビゲーション" className="mobile-menu__window pixel-box">
-          <p className="pixel-tab" aria-hidden="true">
-            MENU
-          </p>
+        <nav aria-label="モバイルナビゲーション">
           <ul>
             {navItems.map((item) => (
               <li key={item.id}>
@@ -110,13 +99,8 @@ export function Header() {
                   onClick={() => setOpen(false)}
                   aria-current={active === item.id ? 'location' : undefined}
                 >
-                  <span className="mobile-menu__cursor pixel" aria-hidden="true">
-                    ▶
-                  </span>
                   <span>{item.label}</span>
-                  <span className="mobile-menu__en pixel" aria-hidden="true">
-                    {item.en}
-                  </span>
+                  <span className="mobile-menu__en">{item.en}</span>
                 </a>
               </li>
             ))}

@@ -8,7 +8,7 @@ type WindowProps = {
   children: ReactNode;
 };
 
-/** 二重枠と金の角飾りで表現した、RPGのウィンドウ風の共通フレーム */
+/** RPGのステータスウィンドウを思わせる、細い枠の共通フレーム */
 export function Window({ label, as: Tag = 'div', className = '', children }: WindowProps) {
   return (
     <Tag className={`window pixel-box ${className}`}>

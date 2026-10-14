@@ -1,0 +1,13 @@
+.logbook {
+  font-family: var(--font-pixel);
+  letter-spacing: 0.03em;
+}
+
+.logbook .panel {
+  padding: 1.75rem 1.75rem 2rem;
+}
+
+.logbook .section-heading__title {
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}

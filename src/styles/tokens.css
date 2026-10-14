@@ -1,41 +1,61 @@
+@font-face {
+  font-family: 'PixelMplus10';
+  src: url('../fonts/PixelMplus10-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
 
-  /* Color */
-  --c-bg: #0a0820;
-  --c-bg-deep: #06051a;
-  --c-surface: #16124a;
-  --c-surface-2: #1c1760;
-  --c-surface-3: #262078;
-  --c-line: rgba(255, 255, 255, 0.16);
-  --c-line-strong: rgba(255, 255, 255, 0.3);
-  --c-text: #ffffff;
-  --c-text-muted: #cfd0ff;
-  --c-text-dim: #9a9ad8;
-  --c-gold: #ffd23f;
-  --c-gold-soft: rgba(255, 210, 63, 0.14);
-  --c-teal: #5ef0ff;
-  --c-teal-soft: rgba(94, 240, 255, 0.12);
-  --c-rose: #f28b82;
-  --c-violet: #8b7cf6;
-  --c-on-accent: #1a1030;
-  --c-frame: #ffffff;
-  --c-window-top: #1c1768;
-  --c-window-bottom: #1c1768;
-  --c-ink: #000000;
+  /* Color — navy, cream, and muted accents */
+  --c-bg: #0a1016;
+  --c-bg-deep: #070b10;
+  --c-surface: #111820;
+  --c-surface-2: #161e28;
+  --c-surface-3: #1c2530;
+  --c-line: rgba(176, 196, 214, 0.12);
+  --c-line-strong: rgba(176, 196, 214, 0.24);
+  --c-text: #ece8dc;
+  --c-text-muted: #a8b0b8;
+  --c-text-dim: #6e7884;
+  --c-gold: #d2bf8a;
+  --c-gold-soft: rgba(210, 191, 138, 0.14);
+  --c-sage: #b7c89a;
+  --c-sage-soft: rgba(183, 200, 154, 0.16);
+  --c-rose: #d4a49c;
+  --c-rose-soft: rgba(212, 164, 156, 0.16);
+  --c-ice: #9bb6c9;
+  --c-ice-soft: rgba(155, 182, 201, 0.16);
+  --c-lilac: #b5a8c8;
+  --c-lilac-soft: rgba(181, 168, 200, 0.16);
+  --c-teal: #7a9e8a;
+  --c-teal-soft: rgba(122, 158, 138, 0.14);
+  --c-violet: #7a7a92;
+  --c-on-accent: #0a1016;
+  --c-frame: rgba(176, 196, 214, 0.28);
+  --c-window-top: #111820;
+  --c-window-bottom: #0d141c;
+  --c-ink: #05080c;
+  --c-arcade: #d2bf8a;
+  --accent: var(--c-sage);
+  --accent-soft: var(--c-sage-soft);
 
   /* Typography */
   --font-body: 'DotGothic16', 'Hiragino Sans', system-ui, sans-serif;
   --font-pixel: 'DotGothic16', 'Hiragino Sans', monospace;
-  --fs-xs: 0.75rem;
-  --fs-sm: 0.875rem;
-  --fs-md: 1rem;
-  --fs-lg: 1.125rem;
-  --fs-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
-  --fs-2xl: clamp(1.75rem, 1.4rem + 1.4vw, 2.5rem);
-  --fs-3xl: clamp(2.25rem, 1.6rem + 3vw, 4rem);
-  --lh-tight: 1.3;
-  --lh-body: 1.85;
+  --font-pixel-rough: 'PixelMplus10', 'DotGothic16', monospace;
+  --font-arcade: 'Press Start 2P', 'DotGothic16', monospace;
+  --fs-xs: 0.6875rem;
+  --fs-sm: 0.8125rem;
+  --fs-md: 0.875rem;
+  --fs-lg: 1rem;
+  --fs-xl: clamp(1.0625rem, 1rem + 0.3vw, 1.1875rem);
+  --fs-2xl: clamp(1.1875rem, 1.05rem + 0.45vw, 1.375rem);
+  --fs-3xl: clamp(1.375rem, 1.15rem + 0.7vw, 1.625rem);
+  --lh-tight: 1.4;
+  --lh-body: 1.8;
 
   /* Spacing (4px base) */
   --sp-1: 0.25rem;
@@ -47,15 +67,15 @@
   --sp-7: 3rem;
   --sp-8: 4rem;
   --sp-9: 6rem;
-  --section-gap: clamp(5rem, 3rem + 8vw, 9rem);
+  --section-gap: clamp(4rem, 3rem + 5vw, 7rem);
 
   /* Shape */
-  --radius-sm: 0;
-  --radius-md: 0;
-  --radius-lg: 0;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 
   /* Elevation */
-  --shadow-pixel: 0 0 0 3px var(--c-ink), 6px 6px 0 3px var(--c-ink);
+  --shadow-pixel: none;
 
   /* Motion */
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
@@ -65,5 +85,5 @@
 
   /* Layout */
   --container: 1120px;
-  --header-h: 68px;
+  --header-h: 56px;
 }

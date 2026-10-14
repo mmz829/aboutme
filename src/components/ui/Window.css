@@ -1,5 +1,5 @@
 .window {
-  padding: var(--sp-6);
+  padding: var(--sp-5);
 }
 
 @media (max-width: 600px) {

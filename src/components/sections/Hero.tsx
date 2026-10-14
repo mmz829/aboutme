@@ -3,10 +3,8 @@ import { profile, status } from '../../data/profile';
 import { useTypewriter } from '../../hooks/useTypewriter';
 import { PixelSprite } from '../ui/PixelSprite';
 import { heroSprite } from '../ui/sprites';
-import { Window } from '../ui/Window';
 import './Hero.css';
 
-/** Matches the breakpoint where the choices collapse to one column in Hero.css */
 const ONE_COLUMN_QUERY = '(max-width: 760px)';
 
 function ChoiceMenu() {
@@ -35,8 +33,8 @@ function ChoiceMenu() {
   };
 
   return (
-    <nav className="choices" aria-label="見たい情報を選ぶ">
-      <ul className="choices__list" onKeyDown={onKeyDown}>
+    <nav className="panel panel--dialog hero-choices" aria-label="見たい情報を選ぶ">
+      <ul className="hero-choices__list" onKeyDown={onKeyDown}>
         {profile.choices.map((c, i) => (
           <li key={c.href}>
             <a
@@ -44,11 +42,11 @@ function ChoiceMenu() {
                 refs.current[i] = el;
               }}
               href={c.href}
-              className={`choices__item ${i === active ? 'is-active' : ''}`}
+              className={`hero-choices__item ${i === active ? 'is-active' : ''}`}
               onMouseEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
             >
-              <span className="choices__cursor" aria-hidden="true">
+              <span className="hero-choices__cursor" aria-hidden="true">
                 ▶
               </span>
               {c.label}
@@ -60,67 +58,59 @@ function ChoiceMenu() {
   );
 }
 
-function MessageWindow() {
+export function Hero() {
   const text = profile.greeting.join('\n');
   const { output, done, skip } = useTypewriter(text, 32);
 
   return (
-    <div className="message pixel-box">
-      <p className="visually-hidden">{profile.greeting.join(' ')}</p>
-      <p className="message__text" aria-hidden="true" onClick={skip}>
-        {output}
-        {!done && <span className="message__caret" />}
-      </p>
-      <ChoiceMenu />
-      <p className="message__hint" aria-hidden="true">
-        ↑↓←→ でえらぶ　Enter でけってい
-      </p>
-    </div>
-  );
-}
-
-export function Hero() {
-  return (
     <section className="hero" aria-labelledby="hero-title">
-      <div className="container">
-        <div className="screen pixel-box">
-          <div className="screen__sky" aria-hidden="true">
-            <span className="screen__moon" />
+      <div className="hero__field">
+        <div className="hero__sky" aria-hidden="true">
+          <span className="hero__moon" />
+        </div>
+        <div className="hero__mountains" aria-hidden="true" />
+        <div className="hero__ground" aria-hidden="true" />
+
+        <div className="hero__identity">
+          <p className="hero__kicker">{profile.role}</p>
+          <h1 id="hero-title" className="hero__name">
+            {profile.name}
+          </h1>
+          <p className="hero__role">{profile.roleJa}</p>
+          <dl className="hero__meta">
+            <div>
+              <dt>Lv</dt>
+              <dd>
+                {profile.level}
+                <span> / {profile.levelNote}</span>
+              </dd>
+            </div>
+            <div>
+              <dt>けいけん</dt>
+              <dd>{status.element}</dd>
+            </div>
+            <div>
+              <dt>きょてん</dt>
+              <dd>{profile.location}</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div className="hero__land">
+          <div className="hero__stage" aria-hidden="true">
+            <span className="hero__shadow" />
+            <PixelSprite rows={heroSprite.rows} palette={heroSprite.palette} className="hero__sprite" />
           </div>
 
-          <div className="screen__layout">
-            <Window className="hero-status">
-              <h1 id="hero-title" className="hero-status__name">
-                <span className="hero-status__rule" aria-hidden="true" />
-                <span className="hero-status__label">{profile.name}</span>
-                <span className="hero-status__rule" aria-hidden="true" />
-              </h1>
-              <p className="hero-status__role">{profile.roleJa}</p>
-              <dl className="hero-status__list">
-                <div>
-                  <dt>Lv</dt>
-                  <dd>
-                    <span className="hero-status__lv">{profile.level}</span>
-                    <span className="hero-status__sub">（{profile.levelNote}）</span>
-                  </dd>
-                </div>
-                <div>
-                  <dt>とくい</dt>
-                  <dd>{status.element}</dd>
-                </div>
-                <div>
-                  <dt>きょてん</dt>
-                  <dd>{profile.location}</dd>
-                </div>
-              </dl>
-            </Window>
-
-            <div className="hero-stage" aria-hidden="true">
-              <span className="hero-stage__shadow" />
-              <PixelSprite rows={heroSprite.rows} palette={heroSprite.palette} className="hero-stage__sprite" />
+          <div className="hero__dialog">
+            <div className="panel panel--dialog dialog-message">
+              <p className="visually-hidden">{profile.greeting.join(' ')}</p>
+              <p className="hero__line" aria-hidden="true" onClick={skip}>
+                {output}
+                {!done && <span className="hero__caret" />}
+              </p>
             </div>
-
-            <MessageWindow />
+            <ChoiceMenu />
           </div>
         </div>
       </div>

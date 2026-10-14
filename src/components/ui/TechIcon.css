@@ -1,0 +1,20 @@
+.tech-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  flex: none;
+}
+
+.tech-icon {
+  display: block;
+  width: 1em;
+  height: 1em;
+  max-width: none;
+  object-fit: contain;
+}
+
+.tech-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+}

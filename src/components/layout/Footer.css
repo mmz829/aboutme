@@ -1,71 +1,50 @@
 .footer {
   margin-top: var(--section-gap);
   padding-block: var(--sp-8) var(--sp-6);
-  border-top: 3px solid var(--c-frame);
-  box-shadow: 0 -3px 0 var(--c-ink);
-  background: var(--c-bg-deep);
+  border-top: 1px solid var(--c-line);
 }
 
 .footer__inner {
-  display: grid;
-  justify-items: center;
-  gap: var(--sp-4);
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--sp-5);
 }
 
 .footer__thanks {
-  color: var(--c-gold);
-  font-size: var(--fs-lg);
+  color: var(--c-sage);
+  font-family: var(--font-arcade);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  -webkit-font-smoothing: none;
 }
 
 .footer__treasure {
-  display: grid;
-  gap: 2px;
-  font-size: var(--fs-sm);
-}
-
-.footer__treasure-count {
-  color: var(--c-text);
-}
-
-.footer__treasure-hint {
+  margin-top: var(--sp-2);
   color: var(--c-text-dim);
   font-size: var(--fs-xs);
 }
 
-.footer__bottom {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--sp-3);
-  width: 100%;
-  margin-top: var(--sp-6);
-  padding-top: var(--sp-5);
-  border-top: 1px solid var(--c-line);
-}
-
-.footer__copy {
+.footer__copy,
+.footer__top {
   color: var(--c-text-dim);
   font-size: var(--fs-xs);
 }
 
 .footer__top {
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
-  gap: var(--sp-2);
-  min-height: 44px;
-  color: var(--c-text-muted);
-  font-size: var(--fs-sm);
-  transition: color var(--dur-fast);
 }
 
 .footer__top:hover {
-  color: var(--c-gold);
+  color: var(--c-text);
 }
 
 @media (max-width: 600px) {
-  .footer__bottom {
-    flex-direction: column-reverse;
+  .footer__inner {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
