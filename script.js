@@ -31,9 +31,9 @@
     "          しーＪ",
   ];
   const readme = [
-    `<span class="c-h1"><span class="c-mark"># </span>${esc(data.profile.name)}</span>`,
+    `<span class="c-h1"><span class="c-mark"># </span>aboutme</span>`,
     "",
-    `<span class="c-text">はじめまして、${esc(data.profile.name)}です。</span>`,
+    `<span class="c-text">はじめまして！</span>`,
     `<span class="c-text">見に来てくださってありがとうございます。</span>`,
     "",
     ...aa.map((l) => {
@@ -72,7 +72,7 @@
       if (!src) return [];
       const label = `${v.artist || ""} - ${v.title || ""}`.trim();
       const start = Math.max(0, Number(v.start) || 0);
-      return [`<div class="track" data-title="${esc(label)}" data-src="${esc(src)}" data-start="${start}"><div class="pf-row pf-song"><span class="pf-key">${esc(k)}</span><span class="pf-val"><button type="button" class="track-btn">${playSvg}</button><span class="track-name">${esc(label)}</span></span></div><div class="track-panel"><div class="track-panel-inner"><div class="track-controls"><span class="track-time">0:00</span><div class="track-bar"><span class="track-bar-fill"></span></div><span class="track-dur">0:00</span><span class="track-vol"><button type="button" class="track-mute" aria-label="ミュート">${speakerSvg("high")}</button><input class="track-volume" type="range" min="0" max="1" step="0.05" value="0.3" aria-label="音量" style="--vol:30%"></span></div></div></div></div>`];
+      return [`<div class="track" data-title="${esc(label)}" data-src="${esc(src)}" data-start="${start}"><div class="pf-row pf-song"><span class="pf-key">${esc(k)}</span><span class="pf-val"><button type="button" class="track-btn">${playSvg}</button><span class="track-name">${esc(label)}</span></span></div><div class="track-panel"><div class="track-panel-inner"><div class="track-controls"><span class="track-time">0:00</span><div class="track-bar"><span class="track-bar-fill"></span></div><span class="track-dur">0:00</span><span class="track-vol"><button type="button" class="track-mute" aria-label="ミュート">${speakerSvg("high")}</button><input class="track-volume" type="range" min="0" max="1" step="0.05" value="0.2" aria-label="音量" style="--vol:20%"></span></div></div></div></div>`];
     }
     const val = esc(Array.isArray(v) ? v.join(k === "likes" ? ", " : " / ") : v);
     return [`<div class="pf-row"><span class="pf-key">${esc(k)}</span><span class="pf-val">${val}</span></div>`];
@@ -95,22 +95,36 @@
   const career = data.career.map((c, i) => {
     const { 使用技術など: tech = "", 担当業務: work = "" } = c.details;
     const tags = tech.split(", ").filter(Boolean).map((t) => `<li>${esc(t)}</li>`).join("");
+    const dateHtml = esc(c.date).replace(
+      /^(\S+)\s+-\s+(\S+)$/,
+      '<span>$1</span><span class="tl-sep"> - </span><span class="tl-gap" aria-hidden="true">x</span><span>$2</span>',
+    );
     return `<div class="tl-item${i === 0 ? " latest" : ""}">
-      <p class="tl-date">${esc(c.date)}</p>
+      <p class="tl-date">${dateHtml}</p>
       <h3 class="tl-title">${esc(c.title)}</h3>
       ${work ? `<p class="tl-work">${esc(work.split(", ").join(" / "))}</p>` : ""}
       ${tags ? `<ul class="tl-tags">${tags}</ul>` : ""}
     </div>`;
   });
 
+  const works = [`<div class="work-grid">${data.works.map((w, i) => {
+    const year = w.year ? `<span class="work-year">${esc(w.year)}</span>` : "";
+    const mark = w.wip ? `<span class="cursor">▍</span> ` : "";
+    const inner = `<span class="work-preview" aria-hidden="true"></span><span class="work-head"><span class="work-title">${mark}${esc(w.title)}</span>${year}</span>`;
+    return w.wip
+      ? `<div class="work-slot is-wip">${inner}</div>`
+      : `<button type="button" class="work-slot" data-work="${i}" aria-haspopup="dialog">${inner}</button>`;
+  }).join("")}</div>`];
+
   const files = [
     { id: "top", name: "README.md", icon: "M↓", lines: readme },
     { id: "profile", name: "profile.json", icon: "{}", lines: profile },
     { id: "skill", name: "skill.ts", icon: "TS", lines: skill },
     { id: "career", name: "career.log", icon: "≡", lines: career },
+    { id: "works", name: "works.py", icon: "py", lines: works },
   ];
 
-  const titles = { profile: ["//", "PROFILE", "わたしについて"], skill: ["//", "SKILL", "できること"], career: ["//", "CAREER", "これまでのこと"] };
+  const titles = { profile: ["//", "PROFILE", "わたしについて"], skill: ["//", "SKILL", "できること"], career: ["//", "CAREER", "これまでのこと"], works: ["//", "WORKS", "つくったもの"] };
   files.forEach((f) => {
     const t = titles[f.id];
     if (!t) return;
@@ -127,6 +141,55 @@
   const link = (f, cls) => `<a href="#${f.id}" class="${cls}" data-id="${f.id}"><span class="icon">${f.icon}</span>${f.name}</a>`;
   document.getElementById("tree").innerHTML = files.map((f) => `<li>${link(f, "")}</li>`).join("");
   document.getElementById("tabs").innerHTML = files.map((f) => link(f, "tab")).join("");
+
+  const workModal = document.getElementById("work-modal");
+  const workModalPanel = workModal.querySelector(".work-modal-panel");
+  const workModalTitle = document.getElementById("work-modal-title");
+  const workModalYear = document.getElementById("work-modal-year");
+  const workModalNote = document.getElementById("work-modal-note");
+  const workModalTags = document.getElementById("work-modal-tags");
+  const workModalPreview = document.getElementById("work-modal-preview");
+  const workModalClose = document.getElementById("work-modal-close");
+  let workModalReturn = null;
+  const closeWork = () => {
+    if (workModal.hidden) return;
+    workModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    if (workModalReturn) workModalReturn.focus();
+  };
+  const openWork = (index) => {
+    const w = data.works[index];
+    if (!w) return;
+    workModalTitle.textContent = w.title;
+    workModalYear.textContent = w.year || "";
+    workModalYear.hidden = !w.year;
+    workModalNote.textContent = w.note ? `// ${w.note}` : "";
+    workModalNote.hidden = !w.note;
+    const tags = Array.isArray(w.tags) ? w.tags : [];
+    workModalTags.innerHTML = tags.map((t) => `<li>${esc(t)}</li>`).join("");
+    workModalTags.hidden = tags.length === 0;
+    workModalPreview.classList.toggle("is-wip", !!w.wip);
+    workModalReturn = document.activeElement;
+    workModal.hidden = false;
+    document.body.classList.add("modal-open");
+    workModalClose.focus();
+  };
+  document.querySelectorAll("[data-work]").forEach((btn) => {
+    btn.addEventListener("click", () => openWork(Number(btn.dataset.work)));
+  });
+  workModalClose.addEventListener("click", closeWork);
+  document.getElementById("work-modal-backdrop").addEventListener("click", closeWork);
+  document.addEventListener("keydown", (e) => {
+    if (workModal.hidden) return;
+    if (e.key === "Escape") closeWork();
+    if (e.key !== "Tab") return;
+    const items = [...workModalPanel.querySelectorAll("button, a[href]")];
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   // active file
   const statusFile = document.getElementById("status-file");
@@ -150,10 +213,40 @@
   };
   window.addEventListener("scroll", updateActive, { passive: true });
 
+  const toTop = document.getElementById("to-top");
+  const syncToTop = () => {
+    const on = window.scrollY > 280;
+    toTop.classList.toggle("is-on", on);
+    toTop.toggleAttribute("inert", !on);
+  };
+  window.addEventListener("scroll", syncToTop, { passive: true });
+  syncToTop();
+  toTop.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
+  const sidebarBtn = document.getElementById("sidebar-btn");
+  const sidebar = document.getElementById("sidebar");
+  const sidebarMq = window.matchMedia("(max-width: 640px)");
+  const setSidebar = (open) => {
+    const show = open && sidebarMq.matches;
+    document.body.classList.toggle("sidebar-open", show);
+    sidebarBtn.setAttribute("aria-expanded", show ? "true" : "false");
+    sidebarBtn.setAttribute("aria-label", show ? "ファイル一覧を閉じる" : "ファイル一覧を開く");
+    if (sidebarMq.matches) sidebar.toggleAttribute("inert", !show);
+    else sidebar.removeAttribute("inert");
+  };
+  sidebarBtn.addEventListener("click", () => setSidebar(!document.body.classList.contains("sidebar-open")));
+  document.getElementById("sidebar-backdrop").addEventListener("click", () => setSidebar(false));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setSidebar(false); });
+  sidebarMq.addEventListener("change", () => setSidebar(false));
+  setSidebar(false);
+
   // smooth scroll can stop short of the last file, so trust the click until the user scrolls
   document.querySelectorAll("[data-id]").forEach((a) => a.addEventListener("click", () => {
     lockedId = a.dataset.id;
     setActive(lockedId);
+    if (a.closest(".sidebar")) setSidebar(false);
     const release = () => { lockedId = null; };
     setTimeout(() => window.addEventListener("wheel", release, { once: true }), 0);
     setTimeout(() => window.addEventListener("touchmove", release, { once: true }), 0);
@@ -189,8 +282,28 @@
   const track = document.querySelector(".track");
   const audio = new Audio();
   audio.preload = "none";
-  audio.volume = 0.3;
+  audio.crossOrigin = "anonymous";
+  audio.setAttribute("playsinline", "");
+  audio.setAttribute("webkit-playsinline", "");
+  audio.style.cssText = "position:fixed;left:-9999px;width:1px;height:1px";
+  document.body.appendChild(audio);
   let resume = false;
+  let level = 0.2;
+  audio.volume = level;
+  let savedVol = level;
+  let ctx = null;
+  let gain = null;
+  const volumeLocked = (() => {
+    const before = audio.volume;
+    audio.volume = before > 0.5 ? before - 0.1 : before + 0.1;
+    const locked = audio.volume === before;
+    audio.volume = before;
+    return locked;
+  })();
+  const isiOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const useGain = volumeLocked || isiOS;
+  let armCue = false;
   const clock = (sec) => {
     if (!Number.isFinite(sec)) return "0:00";
     return `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
@@ -208,34 +321,78 @@
     track.querySelector(".track-time").textContent = clock(audio.currentTime);
     track.querySelector(".track-dur").textContent = clock(duration);
   };
+  const applyLevel = () => {
+    audio.muted = level === 0;
+    if (!useGain) {
+      audio.volume = level;
+      return;
+    }
+    if (!gain) return;
+    const now = ctx.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(level, now);
+    gain.gain.value = level;
+  };
+  const ensureGraph = () => {
+    if (!useGain || ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const next = new AC();
+    const node = next.createGain();
+    node.gain.value = level;
+    next.createMediaElementSource(audio).connect(node).connect(next.destination);
+    ctx = next;
+    gain = node;
+  };
   const resetTrack = () => {
     resume = false;
+    armCue = false;
+    audio.pause();
     track.classList.remove("is-playing");
     setTrackBtn(false);
     track.querySelector(".track-bar-fill").style.width = "0";
     track.querySelector(".track-time").textContent = "0:00";
     track.querySelector(".track-dur").textContent = "0:00";
+    applyLevel();
   };
-  const cueStart = () => {
+  const tryCue = () => {
+    if (!armCue || audio.dataset.started !== "1") return;
+    if (!Number.isFinite(audio.duration) || audio.duration === 0) return;
     const start = Number(track.dataset.start) || 0;
-    if (!resume && start > 0 && audio.duration > start + 20) audio.currentTime = start;
+    armCue = false;
+    if (start > 0 && audio.duration > start + 20 && audio.currentTime < 1) audio.currentTime = start;
+    applyLevel();
   };
-  audio.addEventListener("loadedmetadata", cueStart);
+  audio.addEventListener("playing", () => {
+    audio.dataset.started = "1";
+    tryCue();
+  });
+  audio.addEventListener("durationchange", tryCue);
   audio.addEventListener("timeupdate", paintProgress);
   audio.addEventListener("ended", resetTrack);
   const playTrack = () => {
+    const start = Number(track.dataset.start) || 0;
     track.classList.add("is-playing");
     setTrackBtn(true);
-    if (audio.src !== track.dataset.src) audio.src = track.dataset.src;
-    else cueStart();
-    audio.play().catch(() => resetTrack());
+    if (audio.dataset.loaded !== track.dataset.src) {
+      audio.dataset.started = "";
+      audio.src = track.dataset.src;
+      audio.dataset.loaded = track.dataset.src;
+    }
+    ensureGraph();
+    if (ctx?.state === "suspended") ctx.resume();
+    armCue = !resume && start > 0;
+    const pending = audio.play();
+    if (pending) pending.catch(() => resetTrack());
   };
   if (track) {
     setTrackBtn(false);
     track.querySelector(".track-btn").addEventListener("click", () => {
       if (track.classList.contains("is-playing")) {
         resume = true;
+        armCue = false;
         audio.pause();
+        applyLevel();
         track.classList.remove("is-playing");
         setTrackBtn(false);
         return;
@@ -247,33 +404,39 @@
       const rect = e.currentTarget.getBoundingClientRect();
       audio.currentTime = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1) * audio.duration;
       resume = true;
+      armCue = false;
+      applyLevel();
       if (!track.classList.contains("is-playing")) playTrack();
       else paintProgress();
     });
     const volInput = track.querySelector(".track-volume");
     const muteBtn = track.querySelector(".track-mute");
-    let savedVol = audio.volume;
     const paintVol = () => {
-      const v = audio.volume;
-      volInput.value = String(v);
-      volInput.style.setProperty("--vol", `${v * 100}%`);
-      const mode = v === 0 ? "mute" : v < 0.45 ? "low" : "high";
+      volInput.value = String(level);
+      volInput.style.setProperty("--vol", `${level * 100}%`);
+      const mode = level === 0 ? "mute" : level < 0.45 ? "low" : "high";
       muteBtn.innerHTML = speakerSvg(mode);
-      muteBtn.setAttribute("aria-pressed", v === 0 ? "true" : "false");
-      muteBtn.setAttribute("aria-label", v === 0 ? "ミュート解除" : "ミュート");
+      muteBtn.setAttribute("aria-pressed", level === 0 ? "true" : "false");
+      muteBtn.setAttribute("aria-label", level === 0 ? "ミュート解除" : "ミュート");
     };
-    volInput.addEventListener("input", (e) => {
-      audio.volume = Number(e.currentTarget.value);
-      if (audio.volume > 0) savedVol = audio.volume;
+    const onVol = (e) => {
+      level = Number(e.currentTarget.value);
+      if (level > 0) savedVol = level;
+      armCue = false;
+      applyLevel();
       paintVol();
-    });
+    };
+    volInput.addEventListener("input", onVol);
+    volInput.addEventListener("change", onVol);
     muteBtn.addEventListener("click", () => {
-      if (audio.volume > 0) {
-        savedVol = audio.volume;
-        audio.volume = 0;
+      if (level > 0) {
+        savedVol = level;
+        level = 0;
       } else {
-        audio.volume = savedVol || 0.3;
+        level = savedVol || 0.2;
       }
+      armCue = false;
+      applyLevel();
       paintVol();
     });
     paintVol();
@@ -302,25 +465,35 @@
     }, delay);
   };
 
-  const skillObserver = new IntersectionObserver((entries) => {
-    if (!entries.some((e) => e.isIntersecting)) return;
+  const viewportHeight = () => window.visualViewport?.height || window.innerHeight;
+  const inView = (el, inset = 0) => {
+    const r = el.getBoundingClientRect();
+    return r.bottom > inset && r.top < viewportHeight() - inset;
+  };
+  let gaugesStarted = false;
+  const startGauges = () => {
+    if (gaugesStarted || !inView(document.getElementById("skill"), 24)) return;
+    gaugesStarted = true;
     gauges.forEach((g, i) => animateGauge(g, i * 100));
-    skillObserver.disconnect();
-  }, { threshold: 0.3 });
-  skillObserver.observe(document.getElementById("skill"));
-
-  // career reveal
-  if (!reduceMotion) {
-    const careerObserver = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        e.target.classList.add("shown");
-        careerObserver.unobserve(e.target);
-      });
-    }, { threshold: 0.2, rootMargin: "0px 0px -10% 0px" });
-    document.querySelectorAll(".tl-item").forEach((el) => {
-      el.classList.add("reveal");
-      careerObserver.observe(el);
+  };
+  const revealCareer = () => {
+    document.querySelectorAll(".tl-item.reveal:not(.shown)").forEach((el) => {
+      if (inView(el, 20)) el.classList.add("shown");
     });
+  };
+  const checkInView = () => {
+    startGauges();
+    revealCareer();
+  };
+
+  if (reduceMotion) {
+    gauges.forEach((g) => renderGauge(g, Number(g.dataset.level)));
+  } else {
+    document.querySelectorAll(".tl-item").forEach((el) => el.classList.add("reveal"));
+    window.addEventListener("scroll", checkInView, { passive: true });
+    window.addEventListener("resize", checkInView);
+    window.visualViewport?.addEventListener("scroll", checkInView);
+    window.visualViewport?.addEventListener("resize", checkInView);
+    requestAnimationFrame(() => requestAnimationFrame(checkInView));
   }
 })();
