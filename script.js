@@ -95,8 +95,12 @@
   const career = data.career.map((c, i) => {
     const { 使用技術など: tech = "", 担当業務: work = "" } = c.details;
     const tags = tech.split(", ").filter(Boolean).map((t) => `<li>${esc(t)}</li>`).join("");
+    const dateHtml = esc(c.date).replace(
+      /^(\S+)\s+-\s+(\S+)$/,
+      '<span>$1</span><span class="tl-sep"> - </span><span>$2</span>',
+    );
     return `<div class="tl-item${i === 0 ? " latest" : ""}">
-      <p class="tl-date">${esc(c.date)}</p>
+      <p class="tl-date">${dateHtml}</p>
       <h3 class="tl-title">${esc(c.title)}</h3>
       ${work ? `<p class="tl-work">${esc(work.split(", ").join(" / "))}</p>` : ""}
       ${tags ? `<ul class="tl-tags">${tags}</ul>` : ""}
@@ -189,8 +193,17 @@
   const track = document.querySelector(".track");
   const audio = new Audio();
   audio.preload = "none";
-  audio.volume = 0.3;
+  audio.crossOrigin = "anonymous";
+  audio.setAttribute("playsinline", "");
+  audio.setAttribute("webkit-playsinline", "");
+  audio.style.cssText = "position:fixed;left:-9999px;width:1px;height:1px";
+  document.body.appendChild(audio);
   let resume = false;
+  let level = 0.3;
+  let savedVol = level;
+  let ctx = null;
+  let gain = null;
+  let armCue = false;
   const clock = (sec) => {
     if (!Number.isFinite(sec)) return "0:00";
     return `${Math.floor(sec / 60)}:${String(Math.floor(sec % 60)).padStart(2, "0")}`;
@@ -208,34 +221,71 @@
     track.querySelector(".track-time").textContent = clock(audio.currentTime);
     track.querySelector(".track-dur").textContent = clock(duration);
   };
+  const applyLevel = () => {
+    if (gain) gain.gain.setValueAtTime(level, ctx.currentTime || 0);
+    audio.volume = level;
+    audio.muted = level === 0;
+  };
+  const ensureGraph = () => {
+    if (ctx) return;
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const next = new AC();
+    const node = next.createGain();
+    node.gain.value = armCue ? 0 : level;
+    next.createMediaElementSource(audio).connect(node).connect(next.destination);
+    ctx = next;
+    gain = node;
+  };
   const resetTrack = () => {
     resume = false;
+    armCue = false;
+    audio.pause();
     track.classList.remove("is-playing");
     setTrackBtn(false);
     track.querySelector(".track-bar-fill").style.width = "0";
     track.querySelector(".track-time").textContent = "0:00";
     track.querySelector(".track-dur").textContent = "0:00";
+    applyLevel();
   };
-  const cueStart = () => {
+  const tryCue = () => {
+    if (!armCue || audio.dataset.started !== "1") return;
+    if (!Number.isFinite(audio.duration) || audio.duration === 0) return;
     const start = Number(track.dataset.start) || 0;
-    if (!resume && start > 0 && audio.duration > start + 20) audio.currentTime = start;
+    armCue = false;
+    if (start > 0 && audio.duration > start + 20 && audio.currentTime < 1) audio.currentTime = start;
+    applyLevel();
   };
-  audio.addEventListener("loadedmetadata", cueStart);
+  audio.addEventListener("playing", () => {
+    audio.dataset.started = "1";
+    tryCue();
+  });
+  audio.addEventListener("durationchange", tryCue);
   audio.addEventListener("timeupdate", paintProgress);
   audio.addEventListener("ended", resetTrack);
   const playTrack = () => {
+    const start = Number(track.dataset.start) || 0;
     track.classList.add("is-playing");
     setTrackBtn(true);
-    if (audio.src !== track.dataset.src) audio.src = track.dataset.src;
-    else cueStart();
-    audio.play().catch(() => resetTrack());
+    if (audio.dataset.loaded !== track.dataset.src) {
+      audio.dataset.started = "";
+      audio.src = track.dataset.src;
+      audio.dataset.loaded = track.dataset.src;
+    }
+    ensureGraph();
+    if (ctx?.state === "suspended") ctx.resume();
+    armCue = !resume && start > 0;
+    const pending = audio.play();
+    if (pending) pending.catch(() => resetTrack());
   };
   if (track) {
     setTrackBtn(false);
     track.querySelector(".track-btn").addEventListener("click", () => {
       if (track.classList.contains("is-playing")) {
         resume = true;
+        armCue = false;
         audio.pause();
+        applyLevel();
         track.classList.remove("is-playing");
         setTrackBtn(false);
         return;
@@ -247,33 +297,37 @@
       const rect = e.currentTarget.getBoundingClientRect();
       audio.currentTime = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1) * audio.duration;
       resume = true;
+      armCue = false;
+      applyLevel();
       if (!track.classList.contains("is-playing")) playTrack();
       else paintProgress();
     });
     const volInput = track.querySelector(".track-volume");
     const muteBtn = track.querySelector(".track-mute");
-    let savedVol = audio.volume;
     const paintVol = () => {
-      const v = audio.volume;
-      volInput.value = String(v);
-      volInput.style.setProperty("--vol", `${v * 100}%`);
-      const mode = v === 0 ? "mute" : v < 0.45 ? "low" : "high";
+      volInput.value = String(level);
+      volInput.style.setProperty("--vol", `${level * 100}%`);
+      const mode = level === 0 ? "mute" : level < 0.45 ? "low" : "high";
       muteBtn.innerHTML = speakerSvg(mode);
-      muteBtn.setAttribute("aria-pressed", v === 0 ? "true" : "false");
-      muteBtn.setAttribute("aria-label", v === 0 ? "ミュート解除" : "ミュート");
+      muteBtn.setAttribute("aria-pressed", level === 0 ? "true" : "false");
+      muteBtn.setAttribute("aria-label", level === 0 ? "ミュート解除" : "ミュート");
     };
     volInput.addEventListener("input", (e) => {
-      audio.volume = Number(e.currentTarget.value);
-      if (audio.volume > 0) savedVol = audio.volume;
+      level = Number(e.currentTarget.value);
+      if (level > 0) savedVol = level;
+      armCue = false;
+      applyLevel();
       paintVol();
     });
     muteBtn.addEventListener("click", () => {
-      if (audio.volume > 0) {
-        savedVol = audio.volume;
-        audio.volume = 0;
+      if (level > 0) {
+        savedVol = level;
+        level = 0;
       } else {
-        audio.volume = savedVol || 0.3;
+        level = savedVol || 0.3;
       }
+      armCue = false;
+      applyLevel();
       paintVol();
     });
     paintVol();
@@ -302,25 +356,35 @@
     }, delay);
   };
 
-  const skillObserver = new IntersectionObserver((entries) => {
-    if (!entries.some((e) => e.isIntersecting)) return;
+  const viewportHeight = () => window.visualViewport?.height || window.innerHeight;
+  const inView = (el, inset = 0) => {
+    const r = el.getBoundingClientRect();
+    return r.bottom > inset && r.top < viewportHeight() - inset;
+  };
+  let gaugesStarted = false;
+  const startGauges = () => {
+    if (gaugesStarted || !inView(document.getElementById("skill"), 24)) return;
+    gaugesStarted = true;
     gauges.forEach((g, i) => animateGauge(g, i * 100));
-    skillObserver.disconnect();
-  }, { threshold: 0.3 });
-  skillObserver.observe(document.getElementById("skill"));
-
-  // career reveal
-  if (!reduceMotion) {
-    const careerObserver = new IntersectionObserver((entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        e.target.classList.add("shown");
-        careerObserver.unobserve(e.target);
-      });
-    }, { threshold: 0.2, rootMargin: "0px 0px -10% 0px" });
-    document.querySelectorAll(".tl-item").forEach((el) => {
-      el.classList.add("reveal");
-      careerObserver.observe(el);
+  };
+  const revealCareer = () => {
+    document.querySelectorAll(".tl-item.reveal:not(.shown)").forEach((el) => {
+      if (inView(el, 20)) el.classList.add("shown");
     });
+  };
+  const checkInView = () => {
+    startGauges();
+    revealCareer();
+  };
+
+  if (reduceMotion) {
+    gauges.forEach((g) => renderGauge(g, Number(g.dataset.level)));
+  } else {
+    document.querySelectorAll(".tl-item").forEach((el) => el.classList.add("reveal"));
+    window.addEventListener("scroll", checkInView, { passive: true });
+    window.addEventListener("resize", checkInView);
+    window.visualViewport?.addEventListener("scroll", checkInView);
+    window.visualViewport?.addEventListener("resize", checkInView);
+    requestAnimationFrame(() => requestAnimationFrame(checkInView));
   }
 })();
