@@ -154,6 +154,18 @@
   };
   window.addEventListener("scroll", updateActive, { passive: true });
 
+  const toTop = document.getElementById("to-top");
+  const syncToTop = () => {
+    const on = window.scrollY > 280;
+    toTop.classList.toggle("is-on", on);
+    toTop.toggleAttribute("inert", !on);
+  };
+  window.addEventListener("scroll", syncToTop, { passive: true });
+  syncToTop();
+  toTop.addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+  });
+
   const sidebarBtn = document.getElementById("sidebar-btn");
   const sidebar = document.getElementById("sidebar");
   const sidebarMq = window.matchMedia("(max-width: 640px)");
