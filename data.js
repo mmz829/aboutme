@@ -3,10 +3,17 @@ const SITE_DATA = {
   profile: {
     name: "chihiro",
     job: "System Engineer",
-    location: "Ehime",
+    location: "Ehime🍊",
     likes: ["ライブ", "Notion", "ゲーム", "ドライブ"],
-    myboom: "iOSアプリ開発",
-    comment: "TODO: AWS-SAA取得, iOSアプリ個人開発（実践中）",
+    myboom: "iOS・Webアプリ開発、動画編集",
+    song: {
+      artist: "Cafuné",
+      title: "Tek It",
+      src: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview221/v4/ac/25/c6/ac25c644-057b-1421-ff7c-bdd4a0114459/mzaf_9368654034340652874.plus.aac.p.m4a",
+      start: 26,
+    },
+    "next goal": "自作アプリを5個作ること。技術領域を横断してシステム全体を担えるフルスタックエンジニアになること。",
+    comment: "TODO: AWS-SAA取得（勉強中）",
   },
 
   // level: 0〜100
