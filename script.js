@@ -31,9 +31,9 @@
     "          しーＪ",
   ];
   const readme = [
-    `<span class="c-h1"><span class="c-mark"># </span>${esc(data.profile.name)}</span>`,
+    `<span class="c-h1"><span class="c-mark"># </span>aboutme</span>`,
     "",
-    `<span class="c-text">はじめまして、${esc(data.profile.name)}です。</span>`,
+    `<span class="c-text">はじめまして！</span>`,
     `<span class="c-text">見に来てくださってありがとうございます。</span>`,
     "",
     ...aa.map((l) => {
@@ -72,7 +72,7 @@
       if (!src) return [];
       const label = `${v.artist || ""} - ${v.title || ""}`.trim();
       const start = Math.max(0, Number(v.start) || 0);
-      return [`<div class="track" data-title="${esc(label)}" data-src="${esc(src)}" data-start="${start}"><div class="pf-row pf-song"><span class="pf-key">${esc(k)}</span><span class="pf-val"><button type="button" class="track-btn">${playSvg}</button><span class="track-name">${esc(label)}</span></span></div><div class="track-panel"><div class="track-panel-inner"><div class="track-controls"><span class="track-time">0:00</span><div class="track-bar"><span class="track-bar-fill"></span></div><span class="track-dur">0:00</span><span class="track-vol"><button type="button" class="track-mute" aria-label="ミュート">${speakerSvg("high")}</button><input class="track-volume" type="range" min="0" max="1" step="0.05" value="0.3" aria-label="音量" style="--vol:30%"></span></div></div></div></div>`];
+      return [`<div class="track" data-title="${esc(label)}" data-src="${esc(src)}" data-start="${start}"><div class="pf-row pf-song"><span class="pf-key">${esc(k)}</span><span class="pf-val"><button type="button" class="track-btn">${playSvg}</button><span class="track-name">${esc(label)}</span></span></div><div class="track-panel"><div class="track-panel-inner"><div class="track-controls"><span class="track-time">0:00</span><div class="track-bar"><span class="track-bar-fill"></span></div><span class="track-dur">0:00</span><span class="track-vol"><button type="button" class="track-mute" aria-label="ミュート">${speakerSvg("high")}</button><input class="track-volume" type="range" min="0" max="1" step="0.05" value="0.2" aria-label="音量" style="--vol:20%"></span></div></div></div></div>`];
     }
     const val = esc(Array.isArray(v) ? v.join(k === "likes" ? ", " : " / ") : v);
     return [`<div class="pf-row"><span class="pf-key">${esc(k)}</span><span class="pf-val">${val}</span></div>`];
@@ -288,7 +288,8 @@
   audio.style.cssText = "position:fixed;left:-9999px;width:1px;height:1px";
   document.body.appendChild(audio);
   let resume = false;
-  let level = 0.3;
+  let level = 0.2;
+  audio.volume = level;
   let savedVol = level;
   let ctx = null;
   let gain = null;
@@ -432,7 +433,7 @@
         savedVol = level;
         level = 0;
       } else {
-        level = savedVol || 0.3;
+        level = savedVol || 0.2;
       }
       armCue = false;
       applyLevel();
