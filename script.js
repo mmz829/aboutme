@@ -17,7 +17,6 @@
   const GAUGE_LEN = 16;
 
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const key = (s) => `<span class="c-key">${esc(s)}</span>`;
   const cm = (s) => `<span class="c-comment">${esc(s)}</span>`;
   const kw = (s) => `<span class="c-kw">${s}</span>`;
 
