@@ -117,4 +117,12 @@ const SITE_DATA = {
       },
     },
   ],
+
+  works: [
+    {
+      title: "制作中",
+      note: "できたものから、ここに並べていきます。",
+      wip: true,
+    },
+  ],
 };

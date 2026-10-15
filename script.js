@@ -107,14 +107,24 @@
     </div>`;
   });
 
+  const works = [`<div class="work-grid">${data.works.map((w, i) => {
+    const year = w.year ? `<span class="work-year">${esc(w.year)}</span>` : "";
+    const mark = w.wip ? `<span class="cursor">▍</span> ` : "";
+    const inner = `<span class="work-preview" aria-hidden="true"></span><span class="work-head"><span class="work-title">${mark}${esc(w.title)}</span>${year}</span>`;
+    return w.wip
+      ? `<div class="work-slot is-wip">${inner}</div>`
+      : `<button type="button" class="work-slot" data-work="${i}" aria-haspopup="dialog">${inner}</button>`;
+  }).join("")}</div>`];
+
   const files = [
     { id: "top", name: "README.md", icon: "M↓", lines: readme },
     { id: "profile", name: "profile.json", icon: "{}", lines: profile },
     { id: "skill", name: "skill.ts", icon: "TS", lines: skill },
     { id: "career", name: "career.log", icon: "≡", lines: career },
+    { id: "works", name: "works.py", icon: "py", lines: works },
   ];
 
-  const titles = { profile: ["//", "PROFILE", "わたしについて"], skill: ["//", "SKILL", "できること"], career: ["//", "CAREER", "これまでのこと"] };
+  const titles = { profile: ["//", "PROFILE", "わたしについて"], skill: ["//", "SKILL", "できること"], career: ["//", "CAREER", "これまでのこと"], works: ["//", "WORKS", "つくったもの"] };
   files.forEach((f) => {
     const t = titles[f.id];
     if (!t) return;
@@ -131,6 +141,55 @@
   const link = (f, cls) => `<a href="#${f.id}" class="${cls}" data-id="${f.id}"><span class="icon">${f.icon}</span>${f.name}</a>`;
   document.getElementById("tree").innerHTML = files.map((f) => `<li>${link(f, "")}</li>`).join("");
   document.getElementById("tabs").innerHTML = files.map((f) => link(f, "tab")).join("");
+
+  const workModal = document.getElementById("work-modal");
+  const workModalPanel = workModal.querySelector(".work-modal-panel");
+  const workModalTitle = document.getElementById("work-modal-title");
+  const workModalYear = document.getElementById("work-modal-year");
+  const workModalNote = document.getElementById("work-modal-note");
+  const workModalTags = document.getElementById("work-modal-tags");
+  const workModalPreview = document.getElementById("work-modal-preview");
+  const workModalClose = document.getElementById("work-modal-close");
+  let workModalReturn = null;
+  const closeWork = () => {
+    if (workModal.hidden) return;
+    workModal.hidden = true;
+    document.body.classList.remove("modal-open");
+    if (workModalReturn) workModalReturn.focus();
+  };
+  const openWork = (index) => {
+    const w = data.works[index];
+    if (!w) return;
+    workModalTitle.textContent = w.title;
+    workModalYear.textContent = w.year || "";
+    workModalYear.hidden = !w.year;
+    workModalNote.textContent = w.note ? `// ${w.note}` : "";
+    workModalNote.hidden = !w.note;
+    const tags = Array.isArray(w.tags) ? w.tags : [];
+    workModalTags.innerHTML = tags.map((t) => `<li>${esc(t)}</li>`).join("");
+    workModalTags.hidden = tags.length === 0;
+    workModalPreview.classList.toggle("is-wip", !!w.wip);
+    workModalReturn = document.activeElement;
+    workModal.hidden = false;
+    document.body.classList.add("modal-open");
+    workModalClose.focus();
+  };
+  document.querySelectorAll("[data-work]").forEach((btn) => {
+    btn.addEventListener("click", () => openWork(Number(btn.dataset.work)));
+  });
+  workModalClose.addEventListener("click", closeWork);
+  document.getElementById("work-modal-backdrop").addEventListener("click", closeWork);
+  document.addEventListener("keydown", (e) => {
+    if (workModal.hidden) return;
+    if (e.key === "Escape") closeWork();
+    if (e.key !== "Tab") return;
+    const items = [...workModalPanel.querySelectorAll("button, a[href]")];
+    if (!items.length) return;
+    const first = items[0];
+    const last = items[items.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  });
 
   // active file
   const statusFile = document.getElementById("status-file");
