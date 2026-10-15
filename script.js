@@ -97,7 +97,7 @@
     const tags = tech.split(", ").filter(Boolean).map((t) => `<li>${esc(t)}</li>`).join("");
     const dateHtml = esc(c.date).replace(
       /^(\S+)\s+-\s+(\S+)$/,
-      '<span>$1</span><span class="tl-sep"> - </span><span>$2</span>',
+      '<span>$1</span><span class="tl-sep"> - </span><span class="tl-gap" aria-hidden="true">x</span><span>$2</span>',
     );
     return `<div class="tl-item${i === 0 ? " latest" : ""}">
       <p class="tl-date">${dateHtml}</p>
@@ -203,6 +203,13 @@
   let savedVol = level;
   let ctx = null;
   let gain = null;
+  const volumeLocked = (() => {
+    const before = audio.volume;
+    audio.volume = before > 0.5 ? before - 0.1 : before + 0.1;
+    const locked = audio.volume === before;
+    audio.volume = before;
+    return locked;
+  })();
   let armCue = false;
   const clock = (sec) => {
     if (!Number.isFinite(sec)) return "0:00";
@@ -222,17 +229,22 @@
     track.querySelector(".track-dur").textContent = clock(duration);
   };
   const applyLevel = () => {
-    if (gain) gain.gain.setValueAtTime(level, ctx.currentTime || 0);
-    audio.volume = level;
     audio.muted = level === 0;
+    if (!volumeLocked) {
+      audio.volume = level;
+      return;
+    }
+    if (!gain) return;
+    gain.gain.cancelScheduledValues(ctx.currentTime);
+    gain.gain.value = level;
   };
   const ensureGraph = () => {
-    if (ctx) return;
+    if (!volumeLocked || ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     const next = new AC();
     const node = next.createGain();
-    node.gain.value = armCue ? 0 : level;
+    node.gain.value = level;
     next.createMediaElementSource(audio).connect(node).connect(next.destination);
     ctx = next;
     gain = node;
@@ -312,13 +324,15 @@
       muteBtn.setAttribute("aria-pressed", level === 0 ? "true" : "false");
       muteBtn.setAttribute("aria-label", level === 0 ? "ミュート解除" : "ミュート");
     };
-    volInput.addEventListener("input", (e) => {
+    const onVol = (e) => {
       level = Number(e.currentTarget.value);
       if (level > 0) savedVol = level;
       armCue = false;
       applyLevel();
       paintVol();
-    });
+    };
+    volInput.addEventListener("input", onVol);
+    volInput.addEventListener("change", onVol);
     muteBtn.addEventListener("click", () => {
       if (level > 0) {
         savedVol = level;
