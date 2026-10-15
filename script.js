@@ -154,10 +154,28 @@
   };
   window.addEventListener("scroll", updateActive, { passive: true });
 
+  const sidebarBtn = document.getElementById("sidebar-btn");
+  const sidebar = document.getElementById("sidebar");
+  const sidebarMq = window.matchMedia("(max-width: 640px)");
+  const setSidebar = (open) => {
+    const show = open && sidebarMq.matches;
+    document.body.classList.toggle("sidebar-open", show);
+    sidebarBtn.setAttribute("aria-expanded", show ? "true" : "false");
+    sidebarBtn.setAttribute("aria-label", show ? "ファイル一覧を閉じる" : "ファイル一覧を開く");
+    if (sidebarMq.matches) sidebar.toggleAttribute("inert", !show);
+    else sidebar.removeAttribute("inert");
+  };
+  sidebarBtn.addEventListener("click", () => setSidebar(!document.body.classList.contains("sidebar-open")));
+  document.getElementById("sidebar-backdrop").addEventListener("click", () => setSidebar(false));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") setSidebar(false); });
+  sidebarMq.addEventListener("change", () => setSidebar(false));
+  setSidebar(false);
+
   // smooth scroll can stop short of the last file, so trust the click until the user scrolls
   document.querySelectorAll("[data-id]").forEach((a) => a.addEventListener("click", () => {
     lockedId = a.dataset.id;
     setActive(lockedId);
+    if (a.closest(".sidebar")) setSidebar(false);
     const release = () => { lockedId = null; };
     setTimeout(() => window.addEventListener("wheel", release, { once: true }), 0);
     setTimeout(() => window.addEventListener("touchmove", release, { once: true }), 0);
@@ -210,6 +228,9 @@
     audio.volume = before;
     return locked;
   })();
+  const isiOS = /iPhone|iPad|iPod/.test(navigator.userAgent)
+    || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const useGain = volumeLocked || isiOS;
   let armCue = false;
   const clock = (sec) => {
     if (!Number.isFinite(sec)) return "0:00";
@@ -230,16 +251,18 @@
   };
   const applyLevel = () => {
     audio.muted = level === 0;
-    if (!volumeLocked) {
+    if (!useGain) {
       audio.volume = level;
       return;
     }
     if (!gain) return;
-    gain.gain.cancelScheduledValues(ctx.currentTime);
+    const now = ctx.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(level, now);
     gain.gain.value = level;
   };
   const ensureGraph = () => {
-    if (!volumeLocked || ctx) return;
+    if (!useGain || ctx) return;
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     const next = new AC();

@@ -22,6 +22,9 @@
   <div class="editor">
     <header class="titlebar">
       <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+      <button type="button" class="sidebar-btn" id="sidebar-btn" aria-expanded="false" aria-controls="sidebar" aria-label="ファイル一覧を開く">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.6" y="2.4" width="12.8" height="11.2" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.2"/><path d="M5.6 2.4v11.2" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>
+      </button>
       <span class="titlebar-text">chihiro — ~/aboutme</span>
       <button type="button" class="theme-switch" id="theme-btn" role="switch" aria-checked="true" aria-label="ライトテーマに切り替え">
         <svg class="theme-switch-moon" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M14.6 2.6a8.6 8.6 0 1 0 6.8 12.8A7 7 0 0 1 14.6 2.6z"/></svg>
@@ -31,7 +34,8 @@
     </header>
 
     <div class="workspace">
-      <aside class="sidebar">
+      <button type="button" class="sidebar-backdrop" id="sidebar-backdrop" tabindex="-1" aria-label="ファイル一覧を閉じる"></button>
+      <aside class="sidebar" id="sidebar">
         <p class="sidebar-head">EXPLORER</p>
         <p class="tree-dir">▾ aboutme</p>
         <ul class="tree" id="tree"></ul>

@@ -154,6 +154,16 @@ a[href^="tel:"], .tl-date a {
 }
 :root[data-theme="light"] .theme-switch-thumb { transform: translateX(22px); }
 .theme-switch:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sidebar-btn, .sidebar-backdrop { display: none; }
+.sidebar-btn {
+  width: 24px; height: 24px; flex-shrink: 0; margin-left: 4px; padding: 0;
+  place-items: center;
+  border: 0; background: none; color: var(--muted); cursor: pointer;
+  touch-action: manipulation;
+}
+.sidebar-btn svg { width: 16px; height: 16px; display: block; }
+.sidebar-btn[aria-expanded="true"] { color: var(--text); }
+.sidebar-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .workspace { display: flex; }
 
@@ -375,8 +385,31 @@ a[href^="tel:"], .tl-date a {
 @media (max-width: 640px) {
   body { font-size: 12px; }
   .editor { margin: 0; border: none; border-radius: 0; }
-  .titlebar, .statusbar { border-radius: 0; }
-  .sidebar { display: none; }
+  .titlebar, .statusbar { border-radius: 0; z-index: 40; }
+  .sidebar-btn { display: grid; }
+  .sidebar {
+    display: block;
+    position: fixed; z-index: 30; top: 41px; bottom: 0; left: 0;
+    width: 170px;
+    overflow: auto;
+    transform: translateX(-105%);
+    visibility: hidden;
+    pointer-events: none;
+    transition: transform .18s ease, visibility 0s linear .18s;
+  }
+  body.sidebar-open .sidebar {
+    transform: none;
+    visibility: visible;
+    pointer-events: auto;
+    box-shadow: 8px 0 28px var(--shadow);
+    transition: transform .18s ease, visibility 0s;
+  }
+  .tree { position: static; }
+  body.sidebar-open .sidebar-backdrop {
+    display: block;
+    position: fixed; inset: 0; z-index: 25;
+    border: 0; padding: 0; background: rgba(0, 0, 0, .35); cursor: pointer;
+  }
   .ln { width: 2.4em; padding-right: .7em; }  .c-h1 { font-size: 18px; }
   .status-right { display: none; }
   .statusbar span:last-child { margin-left: auto; }
@@ -391,5 +424,5 @@ a[href^="tel:"], .tl-date a {
   .cursor { animation: none; opacity: 1; }
   .tl-item.reveal:not(.shown) { opacity: 1; transform: none; }
   .tl-item.reveal.shown { animation: none; }
-  .track-panel, .track-bar-fill::after, .theme-switch-thumb { transition: none; }
+  .track-panel, .track-bar-fill::after, .theme-switch-thumb, .sidebar { transition: none; }
 }
